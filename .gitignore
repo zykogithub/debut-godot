@@ -186,6 +186,9 @@ gmon.out
 # Sourcetrail
 *.srctrl*
 
+# godot IDE 
+addons/
+
 # Tags
 # https://github.com/github/gitignore/blob/master/Global/Tags.gitignore
 # Ignore tags created by etags, ctags, gtags (GNU global) and cscope
