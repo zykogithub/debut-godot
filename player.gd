@@ -35,7 +35,12 @@ func _process(delta: float) -> void:
 		$AnimatedSprite2D.flip_v = velocity.y > 0
 
 
-func _on_body_entered(body: Node2D) -> void:
+func _on_body_entered(_body: Node2D) -> void:
 	hide() # Player disappears after being hit.
 	hit.emit()
 	$CollisionShape2D.set_deferred("disabled", true)
+
+func start(pos : Vector2):
+	position = pos
+	show()
+	$CollisionShape2D.disabled = false
