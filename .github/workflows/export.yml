@@ -1,4 +1,5 @@
 name: "godot-deploy"
+
 on:
   pull_request:
     branches: [ "main" ]
@@ -10,80 +11,69 @@ env:
   PROJECT_PATH: .
 
 jobs:
-  export-windows:
-    name: Windows Export
-    runs-on: ubuntu-24.04 
+  export:
+    name: Export ${{ matrix.platform }}
+    runs-on: ubuntu-24.04
     container:
       image: zykodocker25/godot-image:latest
+    strategy:
+      # Si un build échoue, les autres continuent quand même
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows
+            preset: "Windows Desktop"
+            extension: ".exe"
+          - platform: linux
+            preset: "Linux"
+            extension: ".x86_64"
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Setup
+        with:
+          lfs: true
+
+      - name: Setup Godot Config
         run: |
+          # Préparation générique des dossiers
           mkdir -v -p ~/.local/share/godot/export_templates/
           mkdir -v -p ~/.config/
-          mv /root/.config/godot ~/.config/godot
-          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
-      - name: Windows Build
-        run: |
-          mkdir -v -p build/windows
-          EXPORT_DIR="$(readlink -f build)"
-          cd $PROJECT_PATH
-          godot --headless --verbose --export-release "Windows Desktop" "$EXPORT_DIR/windows/$EXPORT_NAME.exe"
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows
-          path: build/windows
+          # On utilise -n (no-clobber) pour ne pas écraser si déjà existant
+          cp -rn /root/.config/godot ~/.config/ || true
+          cp -rn /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/ || true
 
-  export-linux:
-    name: Linux Export
-    runs-on: ubuntu-24.04 
-    container:
-      image: zykodocker25/godot-image:latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      - name: Setup
+      - name: Godot Build
         run: |
-          mkdir -v -p ~/.local/share/godot/export_templates/
-          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
-      - name: Linux Build
-        run: |
-          mkdir -v -p build/linux
-          EXPORT_DIR="$(readlink -f build)"
-          cd $PROJECT_PATH
-          godot --headless --verbose --export-release "Linux" "$EXPORT_DIR/linux/$EXPORT_NAME.x86_64"
+          mkdir -v -p build/${{ matrix.platform }}
+          # Importation automatique pour éviter l'erreur "Must select at least one file"
+          godot --headless --editor --quit --path .
+          # Exportation en utilisant les variables de la matrice
+          godot --headless --verbose --path . --export-release "${{ matrix.preset }}" "build/${{ matrix.platform }}/${{ env.EXPORT_NAME }}${{ matrix.extension }}"
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: linux
-          path: build/linux
+          name: ${{ matrix.platform }}
+          path: build/${{ matrix.platform }}
+
   deploy:
     name: Deploy with Butler
     runs-on: ubuntu-24.04
     container:
       image: zykodocker25/godot-image:latest
-    needs: [export-windows, export-linux]
+    needs: [export] # On attend le job "export" (qui contient les deux plateformes)
     steps:
-      - name: Download Windows Build
+      - name: Download All Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: windows
-          path: build/windows
+          path: build # Télécharge windows/ et linux/ dans le dossier build/
 
-      - name: Download Linux Build
-        uses: actions/download-artifact@v4
-        with:
-          name: linux
-          path: build/linux
       - name: Deploy with Butler
         env:
-          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_API_KEY }}
-          USERNAME: ${{secrets.ITCHIO_USERNAME}}
-          GAME: ${{secrets.ITCHIO_GAME}}
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          USERNAME: ${{ secrets.ITCHIO_USERNAME }}
+          GAME: ${{ secrets.ITCHIO_GAME }}
         run: |
-          echo "$BUTLER_CREDENTIALS" >> .butler_credentials
-          /opt/butler/bin/butler login -v -i ~/.butler_credentials --assume-yes
-          /opt/butler/bin/butler push -v build/windows/${EXPORT_NAME}.exe ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
-          /opt/butler/bin/butler push -v build/linux/${EXPORT_NAME}.x86_64 ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
+          /opt/butler/bin/butler push build/windows/${{ env.EXPORT_NAME }}.exe ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
+          /opt/butler/bin/butler push build/linux/${{ env.EXPORT_NAME }}.x86_64 ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
