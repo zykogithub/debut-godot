@@ -16,6 +16,8 @@ jobs:
     container:
       image: zykodocker25/godot-image:latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: Setup
         run: |
           mkdir -v -p ~/.local/share/godot/export_templates/
@@ -40,6 +42,8 @@ jobs:
     container:
       image: zykodocker25/godot-image:latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: Setup
         run: |
           mkdir -v -p ~/.local/share/godot/export_templates/
