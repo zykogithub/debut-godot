@@ -77,8 +77,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./artifacts/windows/${{ env.EXPORT_NAME }}.exe
-            ./artifacts/linux/${{ env.EXPORT_NAME }}.x86_64
+            ./build/windows/${{ env.EXPORT_NAME }}.exe
+            ./build/linux/${{ env.EXPORT_NAME }}.x86_64
           name: "Release ${{ github.ref_name }}"
           tag_name: ${{ github.ref }}
           draft: false
