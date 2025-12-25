@@ -393,3 +393,6 @@ $RECYCLE.BIN/
 *.msp
 *.lnk
 *.generated.props
+projet.zip
+export_presets.cfg
+Certificat_naherry.pfx
