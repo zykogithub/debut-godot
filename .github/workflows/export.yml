@@ -81,6 +81,7 @@ jobs:
           USERNAME: ${{secrets.ITCHIO_USERNAME}}
           GAME: ${{secrets.ITCHIO_GAME}}
         run: |
-          echo "$BUTLER_CREDENTIALS" | butler login --credentials-file=-
-          butler push build/windows/${EXPORT_NAME}.exe ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
-          butler push build/linux/${EXPORT_NAME}.x86_64 ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
+          echo "$BUTLER_CREDENTIALS" >> .butler_credentials
+          butler login -v -i ~/.butler_credentials --assume-yes
+          butler push -v build/windows/${EXPORT_NAME}.exe ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
+          butler push -v build/linux/${EXPORT_NAME}.x86_64 ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
