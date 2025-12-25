@@ -62,6 +62,8 @@ jobs:
   deploy:
     name: Deploy with Butler
     runs-on: ubuntu-24.04
+    container:
+      image: zykodocker25/godot-image:latest
     needs: [export-windows, export-linux]
     steps:
       - name: Download Windows Build
