@@ -36,7 +36,6 @@ jobs:
 
       - name: Setup Godot Config
         run: |
-          # Préparation générique des dossiers
           mkdir -v -p ~/.local/share/godot/export_templates/
           mkdir -v -p ~/.config/
           # On utilise -n (no-clobber) pour ne pas écraser si déjà existant
@@ -46,9 +45,6 @@ jobs:
       - name: Godot Build
         run: |
           mkdir -v -p build/${{ matrix.platform }}
-          # Importation automatique pour éviter l'erreur "Must select at least one file"
-          godot --headless --editor --quit --path .
-          # Exportation en utilisant les variables de la matrice
           godot --headless --verbose --path . --export-release "${{ matrix.preset }}" "build/${{ matrix.platform }}/${{ env.EXPORT_NAME }}${{ matrix.extension }}"
 
       - name: Upload Artifact
@@ -62,7 +58,7 @@ jobs:
     runs-on: ubuntu-24.04
     container:
       image: zykodocker25/godot-image:latest
-    needs: [export] # On attend le job "export" (qui contient les deux plateformes)
+    needs: [export]
     steps:
       - name: Download All Artifacts
         uses: actions/download-artifact@v4
@@ -75,5 +71,6 @@ jobs:
           USERNAME: ${{ secrets.ITCHIO_USERNAME }}
           GAME: ${{ secrets.ITCHIO_GAME }}
         run: |
+          echo ${USERNAME}/${GAME}:windows
           /opt/butler/bin/butler push build/windows/${{ env.EXPORT_NAME }}.exe ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
           /opt/butler/bin/butler push build/linux/${{ env.EXPORT_NAME }}.x86_64 ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
