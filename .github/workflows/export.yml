@@ -71,6 +71,5 @@ jobs:
           USERNAME: ${{ secrets.ITCHIO_USERNAME }}
           GAME: ${{ secrets.ITCHIO_GAME }}
         run: |
-          echo ${USERNAME}/${GAME}:windows
           /opt/butler/bin/butler push build/windows/${{ env.EXPORT_NAME }}.exe ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
           /opt/butler/bin/butler push build/linux/${{ env.EXPORT_NAME }}.x86_64 ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
