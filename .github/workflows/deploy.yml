@@ -14,6 +14,8 @@ jobs:
   deploy-itch:
     name: Deploy on Itch.io
     runs-on: ubuntu-24.04
+    container:
+      image: zykodocker25/godot-image:latest
     permissions:
       contents: write
     steps:
