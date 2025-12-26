@@ -93,7 +93,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: archive-windows.zip
-          asset_name: ${{ env.EXPORT_NAME }}-windows.exe
+          asset_name: ${{ env.EXPORT_NAME }}-windows.zip
           asset_content_type: application/octet-stream
       - name: Upload Release Asset - Linux
         uses: actions/upload-release-asset@latest
@@ -102,5 +102,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: archive-linux.zip
-          asset_name: ${{ env.EXPORT_NAME }}-linux.x86_64
+          asset_name: ${{ env.EXPORT_NAME }}-linux.zip
           asset_content_type: application/octet-stream
