@@ -97,10 +97,12 @@ jobs:
           draft: false
           prerelease: false
           body: |
-            # v1.0 \n Dans cette première version du jeu
+            # v1.0 
+            Dans cette première version du jeu
             on peut : 
             - déplacer le joueur
-            - voir des enemis apparaitre   
+            - voir des enemis apparaitre
+            le jeu est publié sur itch.io via ce [lien](https://zykoio.itch.io/debut-godot)
       - name: Upload Release Asset - Windows
         uses: actions/upload-release-asset@latest
         env:
