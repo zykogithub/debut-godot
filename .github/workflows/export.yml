@@ -52,29 +52,6 @@ jobs:
         with:
           name: ${{ matrix.platform }}
           path: build/${{ matrix.platform }}
-
-  deploy:
-    name: Deploy on Itch.io
-    runs-on: ubuntu-24.04
-    container:
-      image: zykodocker25/godot-image:latest
-    needs: [export]
-    permissions:
-      contents: write
-    steps:
-      - name: Download All Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: build # Télécharge windows/ et linux/ dans le dossier build/
-
-      - name: Deploy with Butler
-        env:
-          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-          USERNAME: ${{ secrets.ITCHIO_USERNAME }}
-          GAME: ${{ secrets.ITCHIO_GAME }}
-        run: |
-          /opt/butler/bin/butler push build/windows/${{ env.EXPORT_NAME }}.exe ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
-          /opt/butler/bin/butler push build/linux/${{ env.EXPORT_NAME }}.x86_64 ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
   release:
     name: Create Release
     needs: [export]
