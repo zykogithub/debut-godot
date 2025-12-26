@@ -2,7 +2,7 @@ name: "godot-deploy"
 
 on:
   release:
-    types: [published]
+    types: [released]
 
 env:
   EXPORT_NAME: debut
