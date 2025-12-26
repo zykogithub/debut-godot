@@ -84,8 +84,10 @@ jobs:
             le jeu est publié sur itch.io via ce [lien](https://zykoio.itch.io/debut-godot)
       - name : Create zip files
         run : |
-          zip archive-windows.zip build/windows/${{ env.EXPORT_NAME }}.exe build/windows/debut.pck
-          zip archive-linux.zip build/linux/${{ env.EXPORT_NAME }}.x86_64 build/linux/debut.pck
+          mv build/windows/* .
+          mv build/linux/${{ env.EXPORT_NAME }}.x86_64 .
+          zip archive-windows.zip ${{ env.EXPORT_NAME }}.exe debut.pck
+          zip archive-linux.zip ${{ env.EXPORT_NAME }}.x86_64 debut.pck
       - name: Upload Release Asset - Windows
         uses: actions/upload-release-asset@latest
         env:
