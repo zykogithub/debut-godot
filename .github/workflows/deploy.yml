@@ -47,7 +47,7 @@ jobs:
 #           fileName: 'debut-*'
 #           tarBall: false
 #           zipBall: false
-#           out-file-path: 'build'
+#           out-file-path: ''
 #           extract: false
       
 #       - uses: RageAgainstThePixel/setup-steamcmd@v1
