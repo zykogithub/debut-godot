@@ -32,8 +32,10 @@ jobs:
           USERNAME: ${{ secrets.ITCHIO_USERNAME }}
           GAME: ${{ secrets.ITCHIO_GAME }}
         run: |
-          /opt/butler/bin/butler push build/${{ env.EXPORT_NAME }}-windows.exe ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
-          /opt/butler/bin/butler push build/${{ env.EXPORT_NAME }}-linux.x86_64 ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
+          /usr/bin/zip archive-windows.zip build/${{env.EXPORT_NAME}}-windows.exe build/debut.pck
+          /usr/bin/zip archive-linux.zip build/${{env.EXPORT_NAME}}-linux.x86_64 build/debut.pck
+          /opt/butler/bin/butler push archive-windows.zip ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
+          /opt/butler/bin/butler push archive-linux.zip ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
 #   deploy-steam:
 #     name: Deploy on Steam
 #     runs-on: ubuntu-24.04
