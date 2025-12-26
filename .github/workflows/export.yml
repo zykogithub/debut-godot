@@ -15,7 +15,6 @@ jobs:
   export:
     name: Export ${{ matrix.platform }}
     runs-on: ubuntu-24.04
-    if: ${{ startsWith(github.ref, 'refs/pull') }}
     container:
       image: zykodocker25/godot-image:latest
     strategy:

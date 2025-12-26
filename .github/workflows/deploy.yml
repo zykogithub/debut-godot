@@ -5,9 +5,7 @@ on:
     types: [published]
 
 env:
-  GODOT_VERSION: 4.5.1
   EXPORT_NAME: debut
-  PROJECT_PATH: .
 
 jobs:
   deploy-itch:
