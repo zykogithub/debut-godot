@@ -24,7 +24,7 @@ jobs:
             fileName: 'debut-*'
             tarBall: false
             zipBall: false
-            out-file-path: 'build'
+            out-file-path: '.'
             extract: false
       - name: Deploy on Itch.io
         env:
@@ -32,10 +32,8 @@ jobs:
           USERNAME: ${{ secrets.ITCHIO_USERNAME }}
           GAME: ${{ secrets.ITCHIO_GAME }}
         run: |
-          /usr/bin/zip archive-windows.zip build/${{env.EXPORT_NAME}}-windows.exe build/debut.pck
-          /usr/bin/zip archive-linux.zip build/${{env.EXPORT_NAME}}-linux.x86_64 build/debut.pck
-          /opt/butler/bin/butler push archive-windows.zip ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
-          /opt/butler/bin/butler push archive-linux.zip ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
+          /opt/butler/bin/butler push debut-windows.zip ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
+          /opt/butler/bin/butler push debut-linux.zip ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
 #   deploy-steam:
 #     name: Deploy on Steam
 #     runs-on: ubuntu-24.04
