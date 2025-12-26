@@ -3,7 +3,6 @@ name: "godot-deploy"
 on:
   release:
     types: [published]
-  workflow_dispatch:
 
 env:
   GODOT_VERSION: 4.5.1
@@ -85,4 +84,3 @@ jobs:
 #           manifest="${{ steps.upload.outputs.manifest }}"
 #           cat $manifest
 #         shell: bash
-            
