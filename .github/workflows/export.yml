@@ -82,13 +82,17 @@ jobs:
             - déplacer le joueur
             - voir des enemis apparaitre
             le jeu est publié sur itch.io via ce [lien](https://zykoio.itch.io/debut-godot)
+      - name : Create zip files
+        run : |
+          zip archive-windows.zip build/windows/${{ env.EXPORT_NAME }}.exe build/windows/debut.pck
+          zip archive-linux.zip build/linux/${{ env.EXPORT_NAME }}.x86_64 build/linux/debut.pck
       - name: Upload Release Asset - Windows
         uses: actions/upload-release-asset@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/windows/${{ env.EXPORT_NAME }}.exe
+          asset_path: archive-windows.zip
           asset_name: ${{ env.EXPORT_NAME }}-windows.exe
           asset_content_type: application/octet-stream
       - name: Upload Release Asset - Linux
@@ -97,6 +101,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/linux/${{ env.EXPORT_NAME }}.x86_64
+          asset_path: archive-linux.zip
           asset_name: ${{ env.EXPORT_NAME }}-linux.x86_64
           asset_content_type: application/octet-stream
