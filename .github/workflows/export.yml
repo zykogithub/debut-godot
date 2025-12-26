@@ -3,6 +3,7 @@ name: "godot-export"
 on:
   pull_request:
     branches: [ "dev" ]
+  workflow_dispatch: # à supprimer une fois le vrai projet commencé
 
 env:
   GODOT_VERSION: 4.5.1
