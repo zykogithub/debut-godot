@@ -1,0 +1,88 @@
+name: "godot-deploy"
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: 4.5.1
+  EXPORT_NAME: debut
+  PROJECT_PATH: .
+
+jobs:
+  deploy-itch:
+    name: Deploy on Itch.io
+    runs-on: ubuntu-24.04
+    container:
+      image: zykodocker25/godot-image:latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download All Artifacts
+        uses: robinraju/release-downloader@v1
+        with:
+            latest: true
+            tag: 'v1.0'
+            fileName: 'debut-*'
+            tarBall: false
+            zipBall: false
+            out-file-path: 'build'
+            extract: false
+      - name: Deploy on Itch.io
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          USERNAME: ${{ secrets.ITCHIO_USERNAME }}
+          GAME: ${{ secrets.ITCHIO_GAME }}
+        run: |
+          /opt/butler/bin/butler push build/windows/${{ env.EXPORT_NAME }}.exe ${USERNAME}/${GAME}:windows --userversion=$(date +%Y.%m.%d)
+          /opt/butler/bin/butler push build/linux/${{ env.EXPORT_NAME }}.x86_64 ${USERNAME}/${GAME}:linux --userversion=$(date +%Y.%m.%d)
+#   deploy-steam:
+#     name: Deploy on Steam
+#     runs-on: ubuntu-24.04
+#     steps:
+#       - name: Download All Artifacts
+#         uses: robinraju/release-downloader@v1
+#         with:
+#           latest: true
+#           tag: 'v1.0'
+#           fileName: 'debut-*'
+#           tarBall: false
+#           zipBall: false
+#           out-file-path: 'build'
+#           extract: false
+      
+#       - uses: RageAgainstThePixel/setup-steamcmd@v1
+#       - name: Publish to Steam
+#         uses: RageAgainstThePixel/upload-steam@v1
+#         with:
+#           username: ${{ secrets.STEAM_USERNAME }}
+#           password: ${{ secrets.STEAM_PASSWORD }}
+#           app_id: ${{ secrets.STEAM_APP_ID }}
+#           description: |
+#             # v1.0 
+#               Dans cette première version du jeu
+#               on peut : 
+#               - déplacer le joueur
+#               - voir des enemis apparaitre
+#           set_live: 'beta'
+#           depot_file_exclusions: |
+#             assets/*
+#             scenes/*
+#             .github/*
+#             scripts/*
+#             .editorconfig
+#             .gitignore
+#             README.md
+#             .gitattributes
+#             Dockerfile
+#             export_presets.cfg
+#             icon.svg
+#             icon.svg.import
+#             project.godot
+#           install_scripts: ${{ secrets.STEAM_INSTALL_SCRIPTS }}
+#       - run: |
+#           manifest="${{ steps.upload.outputs.manifest }}"
+#           cat $manifest
+#         shell: bash
+            
