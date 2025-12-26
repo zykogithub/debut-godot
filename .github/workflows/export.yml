@@ -73,8 +73,8 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           release_name: Release ${{ github.ref_name }}
-          draft: true
-          prerelease: false
+          draft: false
+          prerelease: true
           body: |
             # ${{ github.ref_name }} 
             Dans cette première version du jeu
