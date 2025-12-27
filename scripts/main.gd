@@ -14,6 +14,7 @@ func _process(_delta: float) -> void:
 
 func new_game() -> void :
 	score = 0
+	$score_scene.entry_gestion()
 	$Player.start($StartPosition.position)
 	$StartTimer.start()
 	$HUD.update_score(score)
@@ -23,6 +24,7 @@ func new_game() -> void :
 	$Music.play()
 
 func game_over() -> void:
+	$score_scene.end_game_gestion(score)
 	$ScoreTimer.stop()
 	$MobTimer.stop()
 	$HUD.show_game_over()
