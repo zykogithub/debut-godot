@@ -5,33 +5,31 @@ var API_KEY =  get_config("SUPABASE_API_KEY")
 var	URL = get_config("SUPABASE_URL")
 var header := PackedStringArray([
 	"apikey: "+API_KEY,
-	"Authorization: Bearer "+API_KEY]) 
-var server_result = {}
+	"Content-Type: application/json"]) 
+var server_result = {"data" : [], "error" : ""}
 var highest_score : int
 var user : String
+var error_label : Label
+signal error
 
 func entry_gestion() :
+	for enfant in $GridContainer.get_children() : $GridContainer.remove_child(enfant)
+	$GridContainer.hide()
 	$TextEdit.hide()
 	user = $TextEdit.text
-	make_request("/player?select=name,score&name=eq.".uri_encode()
-			+user +"&limit=1".uri_encode(),
+	server_result["data"] = []
+	make_request("/player?select=name,highest_score&"+"name=eq."
+			+user +"&"+"limit=1",
 			_on_request_completed_when_entry_gestion)
+		
 
 func end_game_gestion(score : int) :
 	$GridContainer.show()
 	if score > highest_score :
-		var bravo_label = custom_label("Bravo, new high score"+str(score))
-		var timer = Timer.new()
-		bravo_label.set_anchors_and_offsets_preset(Control.LayoutPreset.PRESET_CENTER)
-		add_child(timer)
-		add_child(bravo_label)
-		timer.start(3)
-		timer.timeout.connect(func () : 
-			bravo_label.hide()
-			remove_child(bravo_label))
-		make_request("/player?name=".uri_encode()+user,_on_request_completed_when_new_highest_score,{"highest_score" : score},HTTPClient.METHOD_PATCH)
-	make_request("/player?select=name,highest_score".uri_encode()
-			+ "&order=highest_score.desc".uri_encode() + "&limit=10".uri_encode()
+		highest_score = score
+		make_request("/player?name=eq."+user,_on_request_completed_when_new_highest_score,{"highest_score" : score},HTTPClient.METHOD_PATCH)
+	make_request("/player?select=name,highest_score"
+			+ "&order=highest_score.desc" + "&limit=10"
 			,_on_request_completed_when_end)
 	
 
@@ -44,7 +42,7 @@ func user_connection_handling() :
 					{"name": user, "highest_score" : 0},HTTPClient.METHOD_POST)
 			delete_header_after_inerton()
 		else :
-			highest_score = ["data"][0]["highest_score"]
+			highest_score = server_result["data"][0]["highest_score"]
 			$highest_score.text = "highest score : "+str(highest_score)
 
 func _on_request_completed_when_end(result, _response_code, _headers, body):
@@ -57,36 +55,45 @@ func _on_request_completed_when_entry_gestion(result, _response_code, _headers, 
 	
 func _on_request_completed_when_new_highest_score(result, _response_code, _headers, body):
 	fist_request_handling(result, _response_code, _headers, body)
-	answer_handling(user_connection_handling)
+	answer_handling(func () : pass)
 
 func _on_request_completed_when_user_creation(result, _response_code, _headers, body):
 	fist_request_handling(result, _response_code, _headers, body)
-	answer_handling(func () : if "error" in server_result : error_showing())
+	answer_handling(func () : if server_result["error"] != ""  : error_showing())
 	
 
 func _ready():
 	pass
 
-func get_config(name : String) :
-	if config.has(name) : return config[name]	
+func get_config(nom : String) :
+	if config.has(nom) : return config[nom]	
 	else : return ""
 
 func make_request(parameter : String,signal_handling : Callable,  data = {}, methode : int = HTTPClient.METHOD_GET) :
-	var result
-	$HTTPRequest.request_completed.connect(signal_handling)
+	var result : int
+	var request = HTTPRequest.new()
+	add_child(request)
+	request.request_completed.connect(signal_handling)
 	if data.is_empty() :
-		result = $HTTPRequest.request(URL + parameter,header, HTTPClient.METHOD_GET)
-	else : result = $HTTPRequest.request(URL + parameter,header, methode, JSON.stringify(data))
+		result = request.request(URL + parameter,header, HTTPClient.METHOD_GET)
+	else : result = request.request(URL + parameter,header, methode, JSON.stringify(data))
 	assert(result == OK)
-	$HTTPRequest.request_completed.disconnect(signal_handling)
+	
 
-func fist_request_handling(result, _response_code, _headers, body) :
-	if result != HTTPRequest.RESULT_SUCCESS :  server_result = JSON.stringify({"error" : "erreur réseau"})
+func fist_request_handling(result, response_code, headers, body) :
+	if result != HTTPRequest.RESULT_SUCCESS or response_code > 205 :  
+		server_result["error"] = "erreur réseau" 
+	 	
 	else :
-		var json = JSON.parse_string(body.get_string_from_utf8())
-		if "data" in json : 
-			server_result = json["data"]
-		else : server_result = JSON.stringify({"error" : "erreur réseau"})
+		if body.is_empty() : 
+			return
+		else :
+			var json = JSON.parse_string(body.get_string_from_utf8())
+			if json == null : 
+				server_result["error"] = "erreur réseau"
+			elif typeof(json) == TYPE_ARRAY : 
+				server_result["data"] = json
+			else : server_result["error"] = "erreur réseau"
 		
 func custom_label(text : String, color : Color = Color(0.451, 0.475, 0.49, 1.0)) :
 	var label = Label.new()
@@ -99,17 +106,15 @@ func custom_label(text : String, color : Color = Color(0.451, 0.475, 0.49, 1.0))
 	return label
 
 func answer_handling(function : Callable, ...args) :
-	if "error" in server_result : error_showing()
+	if server_result["error"] != "" : error_showing()
 	else : 
 		if args.is_empty() : function.call()
 		else : function.call(args)
 
 func prepare_insertion() :
-	header.append("Content-Type: application/json")
 	header.append("Prefer: return=minimal")
 
 func delete_header_after_inerton() :
-	header.remove_at(header.size()-1)
 	header.remove_at(header.size()-1)
 
 func result_showing() :
@@ -119,14 +124,13 @@ func result_showing() :
 	$GridContainer.add_child(header_score_label)
 	for valeur in server_result["data"] :
 		var name_label = custom_label(valeur["name"])
-		var score_label = custom_label(valeur["highest_score"])
+		var score_label = custom_label(str(valeur["highest_score"]))
 		$GridContainer.add_child(name_label)
 		$GridContainer.add_child(score_label)
 	$GridContainer.show()
 
 func error_showing() : 
-	var label = custom_label(server_result["error"], Color(0.937, 0.0, 0.337, 1.0))
-	add_child(label)
+	error.emit()
 
 
 func charger_env(chemin: String = "res://.env") -> Dictionary:

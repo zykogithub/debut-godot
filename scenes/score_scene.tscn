@@ -6,8 +6,6 @@
 [node name="score_scene" type="Node"]
 script = ExtResource("1_jn2l2")
 
-[node name="HTTPRequest" type="HTTPRequest" parent="."]
-
 [node name="highest_score" type="Label" parent="."]
 custom_minimum_size = Vector2(200, 0)
 offset_right = 181.0
@@ -37,10 +35,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -104.0
-offset_top = -168.0
-offset_right = 97.0
-offset_bottom = -103.0
+offset_left = -111.0
+offset_top = -230.0
+offset_right = 90.0
+offset_bottom = -165.0
 grow_horizontal = 2
 grow_vertical = 0
 placeholder_text = "Entrez votre nom"

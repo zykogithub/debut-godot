@@ -23,13 +23,18 @@ func new_game() -> void :
 	get_tree().call_group("mobs","queue_free")
 	$Music.play()
 
-func game_over() -> void:
-	$score_scene.end_game_gestion(score)
+
+func end_session() :
 	$ScoreTimer.stop()
 	$MobTimer.stop()
-	$HUD.show_game_over()
 	$Music.stop()
+	
+func game_over() -> void:
+	$score_scene.end_game_gestion(score)
+	end_session()
+	$HUD.show_game_over()
 	$DeathSound.play()
+	
 	
 func _on_mob_timer_timeout() -> void:
 	var mob = mob_scene.instantiate()
@@ -53,9 +58,7 @@ func _on_score_timer_timeout() -> void:
 func _on_start_timer_timeout() -> void:
 	$MobTimer.start()
 	$ScoreTimer.start()
-	
-	
-	
-	
-	
-	
+
+func _on_score_scene_error() -> void:
+	end_session()
+	get_tree().quit(1)
