@@ -14,7 +14,7 @@ func _process(_delta: float) -> void:
 
 func new_game() -> void :
 	score = 0
-	$score_scene.entry_gestion()
+	$onlien_scene.entry_gestion()
 	$Player.start($StartPosition.position)
 	$StartTimer.start()
 	$HUD.update_score(score)
@@ -30,7 +30,7 @@ func end_session() :
 	$Music.stop()
 	
 func game_over() -> void:
-	$score_scene.end_game_gestion(score)
+	$onlien_scene.end_game_gestion(score)
 	end_session()
 	$HUD.show_game_over()
 	$DeathSound.play()
@@ -61,4 +61,11 @@ func _on_start_timer_timeout() -> void:
 
 func _on_score_scene_error() -> void:
 	end_session()
+	$SpecialEventLabel.text = $onlien_scene.server_result["error"]
+	$SpecialEventLabel.show()
+	$ErroTimer.start()
+	
+
+
+func _on_erro_timer_timeout() -> void:
 	get_tree().quit(1)

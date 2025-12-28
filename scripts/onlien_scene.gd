@@ -9,7 +9,6 @@ var header := PackedStringArray([
 var server_result = {"data" : [], "error" : ""}
 var highest_score : int
 var user : String
-var error_label : Label
 signal error
 
 func entry_gestion() :

@@ -1,11 +1,12 @@
-[gd_scene load_steps=10 format=4 uid="uid://cwvgtsae4pj42"]
+[gd_scene load_steps=12 format=4 uid="uid://cwvgtsae4pj42"]
 
 [ext_resource type="Script" uid="uid://c2tjhmdeuq1g2" path="res://scripts/main.gd" id="1_h2yge"]
 [ext_resource type="PackedScene" uid="uid://owtirakc23wf" path="res://scenes/player.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://57er14d6g663" path="res://scenes/mob.tscn" id="2_1bvp3"]
 [ext_resource type="PackedScene" uid="uid://dgeir73w7v1pk" path="res://scenes/hud.tscn" id="4_1bvp3"]
 [ext_resource type="AudioStream" uid="uid://880f7837nirg" path="res://art/gameover.wav" id="5_lquwl"]
-[ext_resource type="PackedScene" uid="uid://cvp1ggv2rf8bn" path="res://scenes/score_scene.tscn" id="6_tefeu"]
+[ext_resource type="PackedScene" uid="uid://cvp1ggv2rf8bn" path="res://scenes/onlien_scene.tscn" id="6_tefeu"]
+[ext_resource type="FontFile" uid="uid://bmymjt8igj5pp" path="res://fonts/Xolonium-Regular.ttf" id="7_o6xl0"]
 
 [sub_resource type="Curve2D" id="Curve2D_lquwl"]
 _data = {
@@ -29,6 +30,9 @@ tags = {
 "title": "House In a Forest Loop"
 }
 loop = true
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tipki"]
+bg_color = Color(0.9371182, 0, 0.3369465, 1)
 
 [node name="Main" type="Node"]
 script = ExtResource("1_h2yge")
@@ -73,11 +77,23 @@ stream = SubResource("AudioStreamOggVorbis_7mycd")
 [node name="DeathSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("5_lquwl")
 
-[node name="score_scene" parent="." instance=ExtResource("6_tefeu")]
+[node name="onlien_scene" parent="." instance=ExtResource("6_tefeu")]
+
+[node name="ErroTimer" type="Timer" parent="."]
+wait_time = 2.0
+
+[node name="SpecialEventLabel" type="Label" parent="."]
+visible = false
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_fonts/font = ExtResource("7_o6xl0")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_tipki")
 
 [connection signal="hit" from="Player" to="." method="game_over"]
 [connection signal="timeout" from="MobTimer" to="." method="_on_mob_timer_timeout"]
 [connection signal="timeout" from="ScoreTimer" to="." method="_on_score_timer_timeout"]
 [connection signal="timeout" from="StartTimer" to="." method="_on_start_timer_timeout"]
 [connection signal="start_game" from="HUD" to="." method="new_game"]
-[connection signal="error" from="score_scene" to="." method="_on_score_scene_error"]
+[connection signal="error" from="onlien_scene" to="." method="_on_score_scene_error"]
+[connection signal="timeout" from="ErroTimer" to="." method="_on_erro_timer_timeout"]

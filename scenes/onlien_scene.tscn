@@ -1,9 +1,9 @@
 [gd_scene load_steps=3 format=3 uid="uid://cvp1ggv2rf8bn"]
 
-[ext_resource type="Script" uid="uid://cddfx58763nns" path="res://scripts/score_scene.gd" id="1_jn2l2"]
+[ext_resource type="Script" uid="uid://cddfx58763nns" path="res://scripts/onlien_scene.gd" id="1_jn2l2"]
 [ext_resource type="FontFile" uid="uid://bmymjt8igj5pp" path="res://fonts/Xolonium-Regular.ttf" id="2_tyil2"]
 
-[node name="score_scene" type="Node"]
+[node name="onlien_scene" type="Node"]
 script = ExtResource("1_jn2l2")
 
 [node name="highest_score" type="Label" parent="."]
@@ -15,19 +15,15 @@ theme_override_font_sizes/font_size = 25
 autowrap_mode = 2
 
 [node name="GridContainer" type="GridContainer" parent="."]
-visible = false
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -118.0
-offset_top = -153.0
-offset_right = 90.0
-offset_bottom = 140.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -157.0
+offset_right = 51.0
+offset_bottom = 293.0
+grow_horizontal = 0
 columns = 2
+metadata/_edit_group_ = true
 
 [node name="TextEdit" type="TextEdit" parent="."]
 anchors_preset = 7
